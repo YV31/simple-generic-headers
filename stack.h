@@ -105,7 +105,7 @@ void stack_free(Stack *stack);
 
 // Returns the size of the stack in elements.
 #define stack_size(stack) \
-  ( ((stack)->sp - (stack)->data) / (stack)->element_size )
+  ( ((uint8_t *)(stack)->sp - (uint8_t *)(stack)->data) / (stack)->element_size )
 
 // Checks is the stack is empty.
 #define stack_empty(stack)  ( stack_size(stack) == 0 ? 1 : 0 )
@@ -118,7 +118,7 @@ void stack_free(Stack *stack);
 
 Stack *stack_new(size_t element_size, size_t size)
 {
-  Stack *stack = malloc(sizeof(Stack));
+  Stack *stack = (Stack *)malloc(sizeof(Stack));
   stack->element_size = element_size;
   stack->max_size = element_size * size;
   stack->data = malloc(stack->max_size);
@@ -130,7 +130,7 @@ int stack_push(Stack *stack, void *val)
 {
   if (stack_size(stack) < stack->max_size / stack->element_size) {
     memcpy(stack->sp, val, stack->element_size);
-    stack->sp = (uint8_t *)(stack->sp + stack->element_size);
+    stack->sp = (uint8_t *)((uint8_t *)stack->sp + stack->element_size);
     return 0;
   } else {
     return 1;
@@ -140,7 +140,7 @@ int stack_push(Stack *stack, void *val)
 int stack_pop(Stack *stack)
 {
   if (stack_size(stack) > 0) {
-    stack->sp = (uint8_t *)(stack->sp - stack->element_size);
+    stack->sp = (uint8_t *)((uint8_t *)stack->sp - stack->element_size);
     return 0;
   } else {
     return 1;
@@ -168,6 +168,7 @@ void stack_free(Stack *stack)
  *  REVISION HISTORY
  *  ================
  *
- *  1.0 - Initial release. [12/12/20]
+ *  1.0 - Initial release.              [12/12/20]
+ *  1.1 - Fix void pointer arithmetics. [17/12/20]
  */
 
