@@ -42,7 +42,6 @@ typedef struct Node {
 
 typedef struct LList {
   Node *head;
-  Node *tail;
   size_t element_size;
 } LList;
 
