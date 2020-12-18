@@ -47,9 +47,8 @@ typedef struct LList {
   size_t element_size;
 } LList;
 
-Node *node_new(void *val, Node *next);
-
 LList *llist_new(size_t element_size);
+Node *node_new(void *data, size_t data_size, Node *next);
 
 void llist_push_back(LList *list, void *val);
 void llist_push_front(LList *list, void *val);
@@ -57,13 +56,123 @@ void llist_push_front(LList *list, void *val);
 void llist_pop_back(LList *list);
 void llist_pop_front(LList *list);
 
-void llist_insert(LList *list, void *val, size_t index);
-void llist_remove(LList *list, size_t index);
+Node *llist_tail(LList *list);
+#define llist_get_head(list) (list->head)
+
+// TODO:
+//   void llist_insert(LList *list, void *val, size_t index);
+//   void llist_remove(LList *list, size_t index);
 
 size_t llist_size(LList *list);
 void llist_free(LList *list);
 
 #ifdef LINKED_LIST_IMPLEMENTATION
+
+LList *llist_new(size_t element_size)
+{
+  LList *list = (LList *)malloc(sizeof(LList));
+  list->head = NULL;
+  list->element_size = element_size;
+  return list;
+}
+
+Node *node_new(void *data, size_t data_size, Node *next)
+{
+  Node *node = (Node *)malloc(sizeof(Node));
+
+  node->data = malloc(data_size);
+  node->next = next;
+
+  memcpy(node->data, data, data_size);
+
+  return node;
+}
+
+void llist_push_back(LList *list, void *val)
+{
+  if (list->head == NULL) {
+    list->head = node_new(val, list->element_size, NULL);
+  } else {
+    llist_tail(list)->next = node_new(val, list->element_size, NULL);
+  }
+}
+
+void llist_push_front(LList *list, void *val)
+{
+  list->head = node_new(val, list->element_size, list->head);
+}
+
+void llist_pop_back(LList *list) 
+{
+  Node *tail = llist_tail(list);
+  if (list->head == tail) {
+    llist_pop_front(list);
+  } else {
+    Node *tmp = list->head;
+
+    while (tmp->next != llist_tail(list)) {
+      tmp = tmp->next;
+    }
+
+    free(tmp->next->data);
+    free(tmp->next);
+
+    tmp->next = NULL;
+  }
+}
+
+
+void llist_pop_front(LList *list)
+{
+  Node *next = list->head->next;
+
+  free(list->head->data);
+  free(list->head);
+
+  list->head = next;
+}
+
+
+size_t llist_size(LList *list)
+{
+  if (list->head == NULL) {
+    return 0;
+  } else {
+    size_t i = 1;
+    Node *tmp = list->head;
+
+    while (tmp->next != NULL) {
+      i++;
+      tmp = tmp->next;
+    }
+
+    return i;
+  }
+}
+
+Node *llist_tail(LList *list)
+{
+  Node *tmp = list->head;
+
+  while (tmp->next != NULL) {
+    tmp = tmp->next;
+  }
+
+  return tmp;
+}
+
+void llist_free(LList *list)
+{
+  Node *tmp = list->head;
+  Node *next;
+
+  while (tmp != NULL) {
+    next = tmp->next;
+    free(tmp->data);
+    free(tmp);
+    tmp = next;
+  }
+}
 
 #endif // LINKED_LIST_IMPLEMENTATION
 
