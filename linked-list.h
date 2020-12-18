@@ -56,7 +56,7 @@ void llist_pop_back(LList *list);
 void llist_pop_front(LList *list);
 
 Node *llist_tail(LList *list);
-#define llist_get_head(list) (list->head)
+#define llist_head(list) (list->head)
 
 // TODO:
 //   void llist_insert(LList *list, void *val, size_t index);
