@@ -33,7 +33,6 @@
 #define LINKED_LIST_H
 
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 typedef struct Node {
