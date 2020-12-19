@@ -223,3 +223,10 @@ void llist_free(LList *list)
 
 #endif // LINKED_LIST_H
 
+/*
+ *  ================
+ *  REVISION HISTORY
+ *  ================
+ *
+ *  1.0 - Initial release.              [18/12/20]
+ */
