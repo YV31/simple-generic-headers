@@ -33,7 +33,6 @@
 #define LINKED_LIST_H
 
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 typedef struct Node {
@@ -43,7 +42,6 @@ typedef struct Node {
 
 typedef struct LList {
   Node *head;
-  Node *tail;
   size_t element_size;
 } LList;
 
@@ -57,11 +55,13 @@ void llist_pop_back(LList *list);
 void llist_pop_front(LList *list);
 
 Node *llist_tail(LList *list);
-#define llist_get_head(list) (list->head)
+#define llist_head(list) (list->head)
 
-// TODO:
-//   void llist_insert(LList *list, void *val, size_t index);
-//   void llist_remove(LList *list, size_t index);
+void llist_insert(LList *list, void *val, size_t index);
+void llist_remove(LList *list, size_t index);
+
+void node_insert_next(Node *node, void *data, size_t data_size);
+void node_remove_next(Node *node);
 
 size_t llist_size(LList *list);
 void llist_free(LList *list);
@@ -121,7 +121,6 @@ void llist_pop_back(LList *list)
   }
 }
 
-
 void llist_pop_front(LList *list)
 {
   Node *next = list->head->next;
@@ -132,6 +131,63 @@ void llist_pop_front(LList *list)
   list->head = next;
 }
 
+Node *llist_tail(LList *list)
+{
+  Node *tmp = list->head;
+
+  while (tmp->next != NULL) {
+    tmp = tmp->next;
+  }
+
+  return tmp;
+}
+
+void llist_insert(LList *list, void *val, size_t index)
+{
+  if (index == 0) {
+    llist_push_front(list, val);
+  } else if (index == llist_size(list) - 1) {
+    llist_push_back(list, val);
+  } else {
+    Node *tmp = list->head;
+
+    for (size_t i = 1; i != index; i++) {
+      tmp = tmp->next;
+    }
+    
+    node_insert_next(tmp, val, list->element_size);
+  }
+}
+
+void llist_remove(LList *list, size_t index)
+{
+  if (llist_size(list) == 1 || index == 0) {
+    llist_pop_front(list);
+  } else {
+    Node *tmp = list->head;
+
+    for (size_t i = 1; i != index; i++) {
+      tmp = tmp->next;
+    }
+
+    node_remove_next(tmp);
+  }
+}
+
+void node_insert_next(Node *node, void *data, size_t data_size)
+{
+  node->next = node_new(data, data_size, node->next);
+}
+
+void node_remove_next(Node *node)
+{
+  Node *next = node->next->next; 
+
+  free(node->next->data);
+  free(node->next);
+
+  node->next = next;
+}
 
 size_t llist_size(LList *list)
 {
@@ -148,17 +204,6 @@ size_t llist_size(LList *list)
 
     return i;
   }
-}
-
-Node *llist_tail(LList *list)
-{
-  Node *tmp = list->head;
-
-  while (tmp->next != NULL) {
-    tmp = tmp->next;
-  }
-
-  return tmp;
 }
 
 void llist_free(LList *list)
@@ -178,3 +223,10 @@ void llist_free(LList *list)
 
 #endif // LINKED_LIST_H
 
+/*
+ *  ================
+ *  REVISION HISTORY
+ *  ================
+ *
+ *  1.0 - Initial release.              [18/12/20]
+ */
